@@ -58,16 +58,34 @@ class ChatScreenState extends State<ChatScreen> {
 
   // private method EditText create
   Widget _buildTextComposer() {
-    return new Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: new TextField(
-        controller: _textController,
-        onSubmitted: _handleSubmitted,
-        decoration: new InputDecoration.collapsed(
-            hintText: "Send a message"),
-      ),
+    return new IconTheme(
+      data: new IconThemeData(color: Theme.of(context).accentColor),
+      child: new Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: new Row(
+          children: <Widget>[
+            // Message edit text
+            new Flexible(
+              child: new TextField(
+                controller: _textController,
+                onSubmitted: _handleSubmitted,
+                decoration: new InputDecoration.collapsed(
+                    hintText: "Send a message"),
+              ),
+            ),
+            // Send button
+            new Container(
+              margin: new EdgeInsets.symmetric(horizontal: 4.0),
+              child: new IconButton(
+                  icon: new Icon(Icons.send),
+                  onPressed: () => _handleSubmitted(_textController.text)),
+            ),
+          ],
+        ),
+      ),                                                             //new
     );
   }
+
 
   // To be notified when the user submits a message
   void _handleSubmitted(String text) {
@@ -77,7 +95,7 @@ class ChatScreenState extends State<ChatScreen> {
 }
 
 
-// todo https://codelabs.developers.google.com/codelabs/flutter/#4
+// todo https://codelabs.developers.google.com/codelabs/flutter/#5
 
 
 
