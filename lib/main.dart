@@ -17,6 +17,8 @@ import 'package:flutter/material.dart';
   );
 }*/
 
+const String _name = "Dmitry";
+
 
 void main() {
   runApp(new FriendlyChatApp());
@@ -42,6 +44,9 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> {
 
+  // List chat messages
+  final List<ChatMessage> _messages = <ChatMessage>[];
+
   // This controller can also be used to clear the field or read its value.
   final TextEditingController _textController = new TextEditingController();
 
@@ -52,7 +57,28 @@ class ChatScreenState extends State<ChatScreen> {
         title: new Text("Friendlychat"),
         backgroundColor: Colors.green,
       ),
-      body: _buildTextComposer(),       // Show text field
+
+      // List messages
+      body: new Column(
+        children: <Widget>[
+          new Flexible(
+              child: new ListView.builder(
+                  padding: new EdgeInsets.all(8.0),
+                  reverse: true,
+                  itemBuilder: (_, int index) => _messages[index],
+                  itemCount: _messages.length,
+              )
+          ),
+
+          new Divider(height: 1.0),
+
+          new Container(
+            decoration: new BoxDecoration(color: Theme.of(context).cardColor),
+
+            child: _buildTextComposer(),    // Show text field
+          )
+        ],
+      ),
     );
   }
 
@@ -90,16 +116,62 @@ class ChatScreenState extends State<ChatScreen> {
   // To be notified when the user submits a message
   void _handleSubmitted(String text) {
     _textController.clear();
+    ChatMessage message = new ChatMessage(
+      text: text,
+    );
+    // Only synchronous operations should be performed in setState()
+    setState((){                      // call to modify _messages and to let the framework know this part of the widget tree has changed and it needs to rebuild the UI.
+      _messages.insert(0, message);
+    });
   }
 
 }
 
 
-// todo https://codelabs.developers.google.com/codelabs/flutter/#5
+
+/// Widget that displays user's chat messages
+class ChatMessage extends StatelessWidget {
+
+  ChatMessage({this.text}); // constructor
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.start,           // position relative to parent widget
+        children: <Widget>[
+          // User avatar
+          new Container(
+            margin: const EdgeInsets.only(right: 16.0),
+            child: new CircleAvatar(child: new Text(_name[0]),),
+          ),
+          // User message
+          new Column(
+            crossAxisAlignment: CrossAxisAlignment.start,       // position relative to parent widget
+            children: <Widget>[
+              new Text(_name, style: Theme.of(context).textTheme.subhead),      // sender's name
+              new Container(
+                margin: const EdgeInsets.only(top: 5.0),                        // messsage
+                child: new Text(text),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+
+}
+
+
+// todo https://codelabs.developers.google.com/codelabs/flutter/#6
 
 
 
-// ========= Default Flutter App ==================================
+// ========= Default Flutter App ===============================================
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
