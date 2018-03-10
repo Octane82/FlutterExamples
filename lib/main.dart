@@ -24,6 +24,7 @@ void main() {
   runApp(new FriendlyChatApp());
 }
 
+
 // StatelessWidget -> no mutable state
 class FriendlyChatApp extends StatelessWidget {
   @override
@@ -35,6 +36,8 @@ class FriendlyChatApp extends StatelessWidget {
   }
 }
 
+
+
 // StatefulWidget is a mutable state
 class ChatScreen extends StatefulWidget {
   @override
@@ -42,7 +45,9 @@ class ChatScreen extends StatefulWidget {
 }
 
 
-class ChatScreenState extends State<ChatScreen> {
+
+
+class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   // List chat messages
   final List<ChatMessage> _messages = <ChatMessage>[];
@@ -108,7 +113,7 @@ class ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
-      ),                                                             //new
+      ),
     );
   }
 
@@ -118,12 +123,25 @@ class ChatScreenState extends State<ChatScreen> {
     _textController.clear();
     ChatMessage message = new ChatMessage(
       text: text,
+      animationController: new AnimationController(
+          duration: new Duration(milliseconds: 700),
+          vsync: this),
     );
     // Only synchronous operations should be performed in setState()
     setState((){                      // call to modify _messages and to let the framework know this part of the widget tree has changed and it needs to rebuild the UI.
       _messages.insert(0, message);
     });
+    message.animationController.forward();
   }
+
+
+  @override
+  void dispose() {
+    for (ChatMessage message in _messages)
+      message.animationController.dispose();
+    super.dispose();
+  }
+
 
 }
 
@@ -132,42 +150,50 @@ class ChatScreenState extends State<ChatScreen> {
 /// Widget that displays user's chat messages
 class ChatMessage extends StatelessWidget {
 
-  ChatMessage({this.text}); // constructor
+  // Constructor
+  ChatMessage({this.text, this.animationController});
+
   final String text;
+  final AnimationController animationController;
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: new Row(
-        crossAxisAlignment: CrossAxisAlignment.start,           // position relative to parent widget
-        children: <Widget>[
-          // User avatar
-          new Container(
-            margin: const EdgeInsets.only(right: 16.0),
-            child: new CircleAvatar(child: new Text(_name[0]),),
-          ),
-          // User message
-          new Column(
-            crossAxisAlignment: CrossAxisAlignment.start,       // position relative to parent widget
+    return new SizeTransition(
+        sizeFactor: new CurvedAnimation(
+            parent: animationController,
+            curve: Curves.easeOut),
+        axisAlignment: 0.0,
+        child: new Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          child: new Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new Text(_name, style: Theme.of(context).textTheme.subhead),      // sender's name
               new Container(
-                margin: const EdgeInsets.only(top: 5.0),                        // messsage
-                child: new Text(text),
-              )
+                margin: const EdgeInsets.only(right: 16.0),
+                child: new CircleAvatar(child: new Text(_name[0])),
+              ),
+              new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text(_name, style: Theme.of(context).textTheme.subhead),
+                  new Container(
+                    margin: const EdgeInsets.only(top: 5.0),
+                    child: new Text(text),
+                  ),
+                ],
+              ),
             ],
-          )
-        ],
-      ),
+          ),
+        )
     );
   }
-
-
 }
 
 
-// todo https://codelabs.developers.google.com/codelabs/flutter/#6
+
+// todo https://codelabs.developers.google.com/codelabs/flutter/#7
+
+
 
 
 
